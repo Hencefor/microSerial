@@ -70,6 +70,7 @@ public class SimpleCommRxTx {
     public static String receiveFromSerial() throws IOException, InterruptedException
     {
     	InputStream comIn = ser.getInputStream();
+    	
         while(comIn.available()==0);
         Thread.sleep(1000);
         int bufferLength=comIn.available();
