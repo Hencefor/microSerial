@@ -15,7 +15,7 @@ public class SimpleCommRxTx {
     static CommPortIdentifier portId;
     static CommPort com;
     static SerialPort ser;
-    static String a="abc";
+    static String a="1";
     static byte[] receiveDataPackage=null;
     public static void main(String[] args) {
         try {
@@ -41,41 +41,46 @@ public class SimpleCommRxTx {
 
         try {
 			// Test TX: send out chars 'D', 'O', 'G', 'S'
-            OutputStream comOut = ser.getOutputStream();
-            byte []datByte = a.getBytes();
-           comOut.write(datByte);
-            Thread.sleep(300);
-           // comOut.write('1');
-//            comOut.write('G');
-//            comOut.write('S');
-//           
+//            OutputStream comOut = ser.getOutputStream();
+//            byte []datByte = a.getBytes();
+//           comOut.write(datByte);
+//            Thread.sleep(300);
+           
+          
             
             
 			// Test RX: display first 4 chars received
-            InputStream comIn = ser.getInputStream();
-            int bufferLength=comIn.available();
-           // for (int i = 0; i < 4; i++){
-            receiveDataPackage=new byte[bufferLength];
-            
-//                while (bufferLength!=0)
-//                {
-//                	System.out.println(bufferLength);
-//                	comIn.read(receiveDataPackage);
-//                	bufferLength=comIn.available();
-//                }
-            
-            byte[] t = new byte[3];
-            comIn.read(t);
-            String ttt=new String(t);
-            
-                String test = new String(receiveDataPackage);
-                System.out.println(ttt);
+//            InputStream comIn = ser.getInputStream();
+//            while(comIn.available()==0);
+//            Thread.sleep(1000);
+//            int bufferLength=comIn.available();
+//            
+//           // for (int i = 0; i < 4; i++){
+//            receiveDataPackage=new byte[bufferLength];
+//            
+////                while (bufferLength!=0)
+////                {
+////                	System.out.println(bufferLength);
+////                	comIn.read(receiveDataPackage);
+////                	bufferLength=comIn.available();
+////                }
+//            
+//            byte[] t = new byte[bufferLength];
+//            comIn.read(t);
+//            String ttt=new String(t);
+//            
+//                String test = new String(receiveDataPackage);
+                System.out.println(receiveFromSerial());
+//                a="Y";
+                
+                
+                
                     // 获取data buffer数据长度
             //}
 
 			// close the streams
-            comOut.close();
-            comIn.close();
+           // comOut.close();
+            //comIn.close();
             
         } catch (Exception e) {
             e.printStackTrace(System.out);
@@ -84,4 +89,39 @@ public class SimpleCommRxTx {
 		// close the port
         ser.close(); 
     }
+    public static void sendToSerial(String s) throws IOException, InterruptedException
+    {
+    	OutputStream comOut = ser.getOutputStream();
+        byte []datByte = a.getBytes();
+       comOut.write(datByte);
+        Thread.sleep(300);
+        comOut.close();
+    }
+    
+    public static String receiveFromSerial() throws IOException, InterruptedException
+    {
+    	InputStream comIn = ser.getInputStream();
+        while(comIn.available()==0);
+        Thread.sleep(1000);
+        int bufferLength=comIn.available();
+        
+       // for (int i = 0; i < 4; i++){
+        receiveDataPackage=new byte[bufferLength];
+        
+//            while (bufferLength!=0)
+//            {
+//            	System.out.println(bufferLength);
+//            	comIn.read(receiveDataPackage);
+//            	bufferLength=comIn.available();
+//            }
+        
+        byte[] t = new byte[bufferLength];
+        comIn.read(t);
+        String ttt=new String(t);
+        comIn.close();
+        return ttt;
+    }
+    
+   
+    
 }
