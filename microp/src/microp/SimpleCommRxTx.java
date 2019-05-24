@@ -15,10 +15,12 @@ public class SimpleCommRxTx {
     static CommPortIdentifier portId;
     static CommPort com;
     static SerialPort ser;
-    static String confirm;
+    static String confirm="0";
     static String operation;
     static int position;
     static int i=0;
+    static String temp;
+    static char ch;
    // static String a="1";
     static byte[] receiveDataPackage=null;
     public static void main(String[] args) {
@@ -42,22 +44,12 @@ public class SimpleCommRxTx {
         }
         String ID;
 		
-		try {
-				ID=receiveFromSerial();
-				System.out.println(ID);
-	            System.out.println(ID.length());
-	            
-            while(ID.length()!=9)
-            {
-            	
-                	sendToSerial("N");
-                	ID=receiveFromSerial();
-            }
-            sendToSerial("Y");
-		} catch (IOException | InterruptedException e1) {
-			// TODO Auto-generated catch block
-			e1.printStackTrace();
-		}
+//		try {
+//				
+//		} catch (IOException | InterruptedException e1) {
+//			// TODO Auto-generated catch block
+//			e1.printStackTrace();
+//		}
             
        
 		
@@ -66,13 +58,35 @@ public class SimpleCommRxTx {
         		
         	 for(int k=0;k<10;k++)
          	{
+        		 Thread.sleep(1000);
+        		 ID=receiveFromSerial();
+ 				System.out.println(ID);
+ 	            System.out.println(ID.length());
+ 	            
+             while(ID.length()!=9)
+             {
+             	
+                 	sendToSerial("N");
+                 	ID=receiveFromSerial();
+                 	System.out.println(ID);
+     	            System.out.println(ID.length());
+             }
+             sendToSerial('Y');
                    
                     Thread.sleep(1000);
                     operation=receiveFromSerial();
                     System.out.println(operation);
                 	   if(operation.equals("P"))
                 	   {
-                		   for(i=0;i<60;i++)/*ÅÐ¶Ï60Ãë*/
+                		   Dock Da = new Dock();
+                		   Da=FileOpeDock.fetchOneDock("A");
+                		   position=Da.releaseScooter();
+                		   
+                		   temp=position+"";
+                		   System.out.println(temp);
+                		   sendToSerial(temp);
+                		   Thread.sleep(1000);
+                		   for(i=0;i<10;i++)/*ÅÐ¶Ï60Ãë*/
                            {
                            	Thread.sleep(1000);
                            	InputStream comIn = ser.getInputStream();
@@ -82,27 +96,39 @@ public class SimpleCommRxTx {
                                	comIn.close();
                                	confirm=receiveFromSerial();
                                //	System.out.println("test");
-                               	if(confirm.equals("E"))
-                               		return;
+                               //	if(confirm.equals("E"))
                                	break;
                                }
                                
                                
                            }
-                		   if(i==60)
-                           	return;
+                		   if(i==10)
+                			   sendToSerial("I");
                 		   
-                	
-                		   Dock Da = new Dock();
-                		   Da=FileOpeDock.fetchOneDock("A");
-                		   position=Da.releaseScooter();
-                		   FileOpeDock.updateDock(Da);
+                		   if(confirm.equals("C")==true)
+                		   {
+                			   
+                    		   FileOpeDock.updateDock(Da);
+                    		   System.out.println("pick"+position+"complete");
+                		   }
+                		  
                 		   
-                		   System.out.println("pick"+position+"complete");
+                		  
                 	   }
+                	   
+                	   
                 	   else if(operation.equals("R"))
                 	   {
-                		   for(i=0;i<60;i++)/*ÅÐ¶Ï60Ãë*/
+                		   Dock Da1 = new Dock();
+                		   Da1=FileOpeDock.fetchOneDock("A");
+                		   position=Da1.retrieveScooter();
+                		   
+                		   temp=position+"";
+                		   System.out.println(temp);
+                		   sendToSerial(temp);
+                		   
+                		   
+                		   for(i=0;i<10;i++)/*ÅÐ¶Ï60Ãë*/
                            {
                            	Thread.sleep(1000);
                            	InputStream comIn = ser.getInputStream();
@@ -110,19 +136,20 @@ public class SimpleCommRxTx {
                                {
                                	comIn.close();
                                	confirm=receiveFromSerial();
-                               	if(confirm.equals("E"))
-                               		return;
+                               //	if(confirm.equals("E"))
                                	break;
                                }
                            }
-                		   if(i==60)
-                           	return;
+                		   if(i==10)
+                			  sendToSerial("I");
                 		   
-                		   Dock Da1 = new Dock();
-                		   Da1=FileOpeDock.fetchOneDock("A");
-                		   position=Da1.retrieveScooter();
-                		   FileOpeDock.updateDock(Da1);
-                		   System.out.println("return"+position+"complete");
+                		   if(confirm.equals("C")==true)
+                		   {
+                			   
+                    		   FileOpeDock.updateDock(Da1);
+                    		   System.out.println("return"+position+"complete");
+                		   }
+                		   
                 	   }
                 		
          	}  
@@ -144,6 +171,16 @@ public class SimpleCommRxTx {
     {
     	OutputStream comOut = ser.getOutputStream();
         byte []datByte = s.getBytes();
+        Thread.sleep(300);
+       comOut.write(datByte);
+        Thread.sleep(300);
+        comOut.close();
+    }
+    
+    public static void sendToSerial(char c) throws IOException, InterruptedException
+    {
+    	OutputStream comOut = ser.getOutputStream();
+        byte datByte = (byte)c;
         Thread.sleep(300);
        comOut.write(datByte);
         Thread.sleep(300);

@@ -17,5 +17,9 @@ public class TestMain {
 		create.add(B);
 		create.add(C);
 		FileOpeDock.writeFileDock(create);
+		String s;
+		int position=1;
+		s=position+"";
+		   System.out.println(s);
 	}
 }
